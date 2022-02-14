@@ -1,0 +1,42 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: utf-8
+      enabled: true
+    
+spring:
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+      
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/photogram?serverTimezone=Asia/Seoul
+    username: cos
+    password: cos1234
+    
+  jpa:
+    open-in-view: true #true일 경우 view단 까지 session을 open한다는 의미
+    hibernate:
+      ddl-auto: update #update로 평소에 쓰다가 테이블 갈아엎을때마다 create쓰고 다시 update로 변경
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
+      
+  servlet:
+    multipart:
+      enabled: true   #multipart타입으로 사진을 받고 max크기가 2mb다.
+      max-file-size: 2MB
+
+  security:    oauth2:      client:        registration:
+          facebook:
+            client-id: 3078622895785402
+            client-secret: 8223e1ec5eacd1a5e25e3257ff4e7d93
+            scope:               - public_profile
+              - email
+
+file:
+  path: C:/workspace/springbootwork/upload/  #이미지 파일 저장 경로
