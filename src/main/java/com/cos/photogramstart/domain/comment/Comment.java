@@ -1,16 +1,22 @@
 package com.cos.photogramstart.domain.comment;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.cos.photogramstart.domain.image.Image;
 import com.cos.photogramstart.domain.likes.Likes;
@@ -43,11 +49,14 @@ public class Comment {
 	@JoinColumn(name= "imageId")
 	@ManyToOne //기본fetch전략 : eager
 	private Image image;
-	
-	private LocalDateTime createDate;
 
-	@PrePersist // DB에 값이 insert되기 직전에 실행
-	public void createDate() {
-		this.createDate = LocalDateTime.now();
+	//원하는 format을 맞추기위해 string타입으로 변환
+	@CreatedDate 
+	private String createDate;
+
+	@PrePersist 
+	public void onPrePersist(){ 
+		this.createDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")); 
+
 	}
 }

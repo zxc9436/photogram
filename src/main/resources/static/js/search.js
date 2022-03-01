@@ -14,40 +14,42 @@ let principalId = $("#principalId").val();
 
 // (1) 스토리 로드하기
 let page = 0;
-let tagName = document.getElementById('aaa').value;
+let tagname = document.getElementById('aaa').value;
 
-function storyLoad() {
+function searchLoad() {
 	$.ajax({
-		url:`/api/image/search?tagName=${tagName}&page=${page}`,
+		url:`/api/image/search?tagname=${tagname}&page=${page}`,
 		dataType:"json"
 	}).done(res=>{
-		if(res.totalElements == 0){
+		if(res.data.totalElements == 0){
 			alert("검색 결과가 없습니다.");
 			window.history.back();
 		}
 		console.log("성공", res);
 		res.data.content.forEach((image)=>{
-			let storyItem = getStoryItem(image);
+			let storyItem = getSearchItem(image);
 			$("#storyList").append(storyItem);
 		})
 	}).fail(error=>{
 		console.log("오류",error);
 	});
 }
-storyLoad();
+searchLoad();
 
-function getStoryItem(image) {
-	let item =`<div class="story-list__item  id="storyListItem-${image.id}" ">
+function getSearchItem(image) {
+	let item =`<div class="story-list__item"  id="storyListItem-${image.id}">
 						<div class="sl__item__header">
 							<div>
-								<img class="profile-image" src="/upload/${image.user.profileImageUrl}"
-									onerror="this.src='/images/basic.png'" />
+								<a href="/user/${image.user.id}"><img class="profile-image" src="/upload/${image.user.profileImageUrl}"
+									onerror="this.src='/images/basic.png'" /></a>
 							</div>
 							<div><b><a href="/user/${image.user.id}">${image.user.username}</a></b></div>
-								<button class="modi" onclick="popup('.modal-info')">
-									<i class="fas fa-bars"></i>
-								</button>
-							</div>
+								<div style="float:right;">
+									<button type="button" class="modi" onclick="popup('.modal-info',${image.id})" style="border: none; background: none;">
+										<i class="fas fa-bars"></i>
+									</button>
+								</div>
+						</div>
 							
 
 						<div class="sl__item__img">
@@ -79,7 +81,7 @@ function getStoryItem(image) {
 								item +=`
 									<span class="tag-span" onclick="location.href='/image/search?name=${tags.name}'">#${tags.name}</span>`;
 								});
-								item +=`</div>`;
+								item +=`</div><div id="storyCommentList-${image.id}">`;
 								
 								image.comment.forEach((comment)=>{
 									item +=`<div class="sl__item__contents__comment" id="storyCommentItem-${comment.id}">
@@ -94,25 +96,24 @@ function getStoryItem(image) {
 									}
 									
 									item +=`
-									</div>`;
+									</div>
+									<span class="commentDate" id="commentDate-${comment.id}"}>${comment.createDate}</span>`;
 								});
 								
 							item +=`
-							</div>
+						</div>
 							<div class="sl__item__input">
 								<input type="text" placeholder="댓글 달기..." id="storyCommentInput-${image.id}" />
 								<button type="button" onClick="addComment(${image.id})">게시</button>
 							</div>
-					
-						</div>
 					</div>
 					<div class="modal-info" onclick="modalStory()">
 						<div class="modal">
-							<button onclick="storyDelete(${image.id})">삭제</button>
-							<button onclick="#">로그아웃</button>
+							<button onclick="storyDelete(deleteId)"><span style="color:red;"><strong>삭제</strong></span></button>
 							<button onclick="closePopup('.modal-story')">취소</button>
 						</div>
 					</div>
+				</div>
 					`;
 	return item;
 }
@@ -127,7 +128,7 @@ $(window).scroll(() => {
 	
 	if(checkNum <1 && checkNum > -1){
 		page++;
-		storyLoad();
+		searchLoad();
 	}
 });
 
@@ -194,6 +195,10 @@ function addComment(imageId) {
 		alert("댓글을 작성해주세요!");
 		return;
 	}
+	if (data.content.length > 100) { //프론트 단에서 막기
+		alert("댓글은 100자 이내로 작성해 주세요.");
+		return;
+	}
 	
 	$.ajax({
 		type:"post",
@@ -213,7 +218,8 @@ function addComment(imageId) {
 		      ${comment.content}
 		    </p>
 		    <button onclick="deleteComment(${comment.id})"><i class="fas fa-times"></i></button>
-		  </div>`;
+		  </div>
+		  <span class="commentDate" id="commentDate-${comment.id}"}>${comment.createDate}</span>`;
 		commentList.prepend(content);
 		
 	}).fail(error=>{
@@ -235,6 +241,7 @@ function deleteComment(commentId) {
 	}).done(res=>{
 		console.log("성공",res);
 		$(`#storyCommentItem-${commentId}`).remove();
+		$(`#commentDate-${commentId}`).remove();
 	}).fail(error=>{
 		console.log("실패",error);
 	})
@@ -254,7 +261,8 @@ function storyDelete(imageId) {
 	})
 }
 
-function popup(obj) {
+function popup(obj, imageId) {
+	deleteId = imageId;
 	$(obj).css("display", "flex");
 }
 

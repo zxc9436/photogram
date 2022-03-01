@@ -54,3 +54,29 @@
     width: 100%;
   }
 }
+#keyword{
+	border: 1px solid gainsboro;
+	border-radius:8px;
+	height:30px;
+	padding-left:5px;
+}
+#keyword:focus{
+	outline:2px solid gainsboro;
+}
+.searchingForm{
+	position: relative;
+}
+.searchingForm i{
+	position: absolute;
+    left: 150px;
+    top: 7px;
+    color: gray;
+}
+.searchingForm #xxx{
+	position: absolute;
+    left: 150px;
+    top: 7px;
+    width:20px;
+    z-index:1025; /* 겹쳤을때 누가 위에있을껀지 순서 */
+    opacity: 0;    /* 투명도 */
+}

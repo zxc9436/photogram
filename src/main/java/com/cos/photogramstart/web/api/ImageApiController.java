@@ -63,9 +63,9 @@ public class ImageApiController {
 
 	//태그관련
     @GetMapping("/api/image/search")
-    public ResponseEntity<?> searchTag(@RequestParam(value="tagName", required=false) String tagName, @AuthenticationPrincipal PrincipalDetails principalDetails,
+    public ResponseEntity<?> searchTag(@RequestParam(value="tagname", required=false) String tagname, @AuthenticationPrincipal PrincipalDetails principalDetails,
                                 @PageableDefault(size=3) Pageable pageable) {
-    	Page<Image> images = imageService.태그검색(tagName, principalDetails.getUser().getId(), pageable);
+    	Page<Image> images = imageService.태그검색(tagname, principalDetails.getUser().getId(), pageable);
     	
         return new ResponseEntity<>(new CMRespDto<>(1,"태그검색 성공", images), HttpStatus.OK);
     }

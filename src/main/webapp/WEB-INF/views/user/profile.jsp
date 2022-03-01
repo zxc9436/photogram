@@ -64,7 +64,6 @@
 			</div>
 		</div>
 		<!--유저정보 및 사진등록 구독하기-->
-
 	</div>
 </section>
 
@@ -78,10 +77,11 @@
 			<div class="tab-1-content-inner">
 
 				<!--아이템들-->
+				
 				<c:forEach var="image" items="${dto.user.images}"> <!-- EL 표현식에서 변수명을 적으면 get함수가 자동 호출된다. -->
-					<div class="img-box">
-						<a href=""> <img src="/upload/${image.postImageUrl}" />
-						</a>
+				
+					<div class="img-box" onclick="javascript:storyInfoModalOpen(${image.id});">
+						<img src="/upload/${image.postImageUrl}" />
 						<div class="comment">
 							<a href="#" class=""><i class="fas fa-heart"></i><span><b>${image.likeCount}</b></span>
 							</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -89,7 +89,9 @@
 							</a>
 						</div>
 					</div>
+					
 				</c:forEach>
+				
 				<!--아이템들end-->
 				
 			</div>
@@ -116,6 +118,7 @@
 	</div>
 </div>
 
+
 <!--프로필사진 바꾸기 모달end-->
 
 <div class="modal-subscribe">
@@ -131,10 +134,13 @@
 
 		</div>
 	</div>
-
 </div>
 
+ <div class="modal-story" id="modalStory">
+	
+</div>
 
+<script src="/js/story.js"></script>
 <script src="/js/profile.js"></script>
 
 <%@ include file="../layout/footer.jsp"%>

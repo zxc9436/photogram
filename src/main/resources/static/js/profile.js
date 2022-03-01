@@ -7,7 +7,6 @@
   (5) 사용자 정보 메뉴 열기 닫기
   (6) 사용자 정보(회원정보, 로그아웃, 닫기) 모달
   (7) 사용자 프로파일 이미지 메뉴(사진업로드, 취소) 모달 
-  (8) 구독자 정보 모달 닫기
  */
 
 // (1) 유저 프로파일 페이지 구독하기, 구독취소
@@ -65,7 +64,7 @@ function getSubscribeModalItem(u) {
 		<img src="/upload/${u.profileImageUrl}" onerror="this.src='/images/basic.png'"/>
 	</div>
 	<div class="subscribe__text">
-		<h2>${u.username}</h2>
+		<h2><a href="/user/${u.id}" id="commentId">${u.username}</a></h2>
 	</div>
 	<div class="subscribe__btn">`;
 	
@@ -158,8 +157,134 @@ function modalClose() {
 	location.reload();
 }
 
+// (8) 프로필 페이지 게시글 모달통신
+function storyInfoModalOpen(imageId) {
+	$(".modal-story").css("display", "flex");
+	$.ajax({
+		url:`/api/user/${imageId}`,
+		dataType:"json"
+	}).done(res=>{
+		console.log("스토리 모달 출력성공",res.data);
+			let item = getStoryModalItem(res.data);
+			$("#modalStory").append(item);
+	}).fail(error=>{
+		console.log("스토리 모달 출력실패",error);
+	});
+}
 
+function getStoryModalItem(i){
+	let item = `
+	<div class="story" id=story-${i.id}>
+	
+		<div class="story-header">
+			<span>스토리 테스트
+			`;
+			if(principalId == i.user.id){
+				item +=`
+				<button type="button" id="modi" onclick="popup('.modal-delete',${i.id})" style="border: none; background: none;">
+						<i class="fas fa-bars"></i>
+				</button>`;
+			}
+			item +=`
+			</span>	
+				<button onclick="modalClose()">
+					<i class="fas fa-times"></i>
+				</button>
+		</div>
+		
+		<div class="story-list" id="storyModalList">
+			<div class="story-image" id="storyImage">
+				<img src="/upload/${i.postImageUrl}" alt="error image" style="width:100%; height:646px;">
+			</div>
+			
+			<div class="story-content" id="storyContent">
+				<div class="storyTelling">
+						<b>${i.user.username}&nbsp;&nbsp;</b>${i.caption}
+						<div class="sl__item__contents__tags">`;
+						
+						i.tags.forEach((tags)=>{
+									item +=`
+										<span class="tag-spanModal" onclick="location.href='/image/search?name=${tags.name}'" >#${tags.name}</span>`;
+									});
+		   item +=`</div>
+		   		<div id="storyCommentList-${i.id}">`;
+		   		i.comment.forEach((comment)=>{
+									item +=`<div id="storyCommentItem-${comment.id}">
+													<p>
+														<b><a href="/user/${comment.user.id}" id="commentId">${comment.user.username}</a> :</b> ${comment.content}
+													</p>`;
+					
+									if(principalId == comment.user.id){
+										item +=`<button onclick="deleteComment(${comment.id})">
+														<i class="fas fa-times"></i>
+													 </button>`;
+									}
+		   		
+			item +=`</div>
+				</div>
+				<span class="commentDate" id="commentDate-${comment.id}"}>${comment.createDate}</span>`;
+				});
+				
+				
+			item +=`</div>
+				<div class="storyLikes">
+					<div class="sl__item__contents__icon">
+					<button>`;
+									//좋아요 아이콘
+									if(i.likeState){
+										item +=`<i class="fas fa-heart active" style="margin-left:15px;" id="storyLikeIcon-${i.id}" onclick="toggleLike(${i.id})"></i>`;
+										
+									}else{
+										item +=`<i class="far fa-heart" style="margin-left:15px;" id="storyLikeIcon-${i.id}" onclick="toggleLike(${i.id})"></i>`;
+										
+									}
+	  item +=`</button>
+	  				</div>
+	  			<span class="like"><b id="storyLikeCount-${i.id}">${i.likeCount} </b>likes</span>
+	  				<p style="margin-left:15px; margin-top:10px;">${i.createDate}</p>
+				</div>
+				<div class="storyComment">
+						<input type="text" placeholder="댓글 달기..."  id="storyCommentInput-${i.id}" style="width:92%; border:none; padding-left:20px; font-size:15px; padding-top:15px;"/>
+						<button type="button" onclick="addComment(${i.id})" style="border:none; background-color:white; color:#01A9DB;"><b>게시</b></button>	
+				</div>
+			</div>
+			<div class="modal-delete" onclick="modalDelete()">
+				<div class="modal">
+					<button onclick="myStoryDelete(deleteId)"><span style="color:red;"><strong>삭제</strong></span></button>
+					<button onclick="closePopup('.modal-delete')">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+`;
+	
+	return item;
+}
 
+function modalDelete() {
+	$(".modal-delete").css("display", "none");
+}
+function popup(obj, imageId) {
+	deleteId = imageId;
+	$(obj).css("display", "flex");
+}
 
+function closePopup(obj) {
+	$(obj).css("display", "none");
+}
 
-
+function myStoryDelete(imageId) {
+		$.ajax({
+		type:"delete",
+		url:`/api/image/${imageId}`,
+		dataType:"json"
+	}).done(res=>{
+		console.log("성공",res);
+		$(`#story-${imageId}`).remove();
+		window.location.replace("/");
+	}).fail(error=>{
+		console.log("실패",error);	
+	})
+}
+/* js 파일 include하는 효과 */
+//document.write('<script type="text/javascript" src="/js/story.js"></script>');

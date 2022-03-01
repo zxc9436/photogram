@@ -30,10 +30,12 @@ public class Tag {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id; 
+	
 	private String name;
 	
-	@ManyToOne
+	
 	@JoinColumn(name="imageId")
+	@ManyToOne
 	private Image image;
 	
 	private LocalDateTime createDate;

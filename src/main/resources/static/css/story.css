@@ -94,7 +94,8 @@
   .sl__item__contents
   .sl__item__contents__icon {
   height: 40px;
-  padding: 5px 0;      
+  padding: 5px 0;
+  padding-left:5px;     
 }
 
 /*좋아요 실제 버튼*/
@@ -148,8 +149,16 @@
 /*태그영역*/
 .sl__item__contents__tags{
   height: 40px;
-  padding: 5px 10px;  
   color: #0080ff;
+}
+
+.tag-span{
+	padding-left:15px;
+	color:blue;
+}
+.tag-spanModal{
+	margin-top:5px;
+	color:blue;
 }
 
 /*코멘트 = 댓글 */
@@ -216,5 +225,19 @@
 
 .profile-image {
   border: 2px solid #8a3ab8;
+}
+
+#commentId:hover{
+	text-decoration:underline; 
+	color:gray;
+}
+
+.commentId:link .commentId:visited{
+	color:#000000;
+}
+.commentDate{
+	padding-left:15px;
+	color:#b1b1a9;
+	font-size:12px;
 }
 

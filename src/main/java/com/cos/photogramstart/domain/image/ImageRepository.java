@@ -17,7 +17,7 @@ public interface ImageRepository extends JpaRepository<Image, Integer>{
 	@Query(value ="SELECT i.* FROM image i INNER JOIN (SELECT imageId, COUNT(imageId) likeCount FROM likes GROUP BY imageId) c ON i.id = c.imageId ORDER BY likeCount DESC", nativeQuery = true)
 	List<Image> mPopular();
 
-    @Query(value ="SELECT a.* FROM image a, tag b  WHERE a.id = b.imageId AND b.name LIKE ':tagName'", nativeQuery = true)
-    Page<Image> searchResult(String tagName, Pageable pageable);
+    @Query(value ="SELECT a.* FROM image AS a INNER JOIN tag AS b ON a.id = b.imageId WHERE name = :tagname ", nativeQuery = true)
+    Page<Image> searchResult(@Param("tagname") String tagname, Pageable pageable);
     
 }

@@ -103,4 +103,16 @@ public class UserService {
 		return userEntity;
 		//더티체킹이 일어나서 업데이트 완료됨
 	}
+	
+	@Transactional
+	public int 검색(String keyword) {
+		try {
+			userRepository.searchUser(keyword);
+		} catch (Exception e) {
+			throw new CustomException("사용자가 존재하지 않습니다.");
+		}
+		int searchUserId = userRepository.searchUser(keyword);
+		
+		return searchUserId;
+	}
 }

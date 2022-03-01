@@ -1,6 +1,7 @@
 package com.cos.photogramstart.domain.image;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -13,6 +14,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.PrePersist;
 import javax.persistence.Transient;
+
+import org.springframework.data.annotation.CreatedDate;
 
 import com.cos.photogramstart.domain.comment.Comment;
 import com.cos.photogramstart.domain.likes.Likes;
@@ -65,12 +68,14 @@ public class Image {
 	@Transient
 	private int likeCount;
 	
-	private LocalDateTime createDate;
+	//원하는 format을 맞추기위해 string타입으로 변환
+	@CreatedDate 
+	private String createDate;
 
-	@PrePersist // DB에 값이 insert되기 직전에 실행
-	public void createDate() {
-		this.createDate = LocalDateTime.now();
-	}
+	@PrePersist 
+	public void onPrePersist(){ 
+		this.createDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")); 
+		}
 	// 오브젝트를 콘솔에 출력할 때 문제가 될 수 있어서 User부분을 출력되지 않게 함.
 //	@Override
 //	public String toString() {

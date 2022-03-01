@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.cos.photogramstart.config.auth.PrincipalDetails;
+import com.cos.photogramstart.domain.image.Image;
+import com.cos.photogramstart.service.ImageService;
 import com.cos.photogramstart.service.UserService;
 import com.cos.photogramstart.web.dto.user.UserProfileDto;
 
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 	
 	private final UserService userService;
+	private final ImageService imageService;
 
 	@GetMapping("/user/{pageUserId}")
 	public String profile(@PathVariable int pageUserId, Model model, @AuthenticationPrincipal PrincipalDetails principalDetails) {
@@ -28,5 +31,12 @@ public class UserController {
 	@GetMapping("/user/{id}/update")
 	public String update(@PathVariable int id, @AuthenticationPrincipal PrincipalDetails principalDetails) {
 		return "user/update";
+	}
+	
+	@GetMapping("/user/search")
+	public String search(String keyword, Model model,@AuthenticationPrincipal PrincipalDetails principalDetails) {
+		int pageUserId = userService.검색(keyword);
+		return profile(pageUserId, model, principalDetails);
+		
 	}
 }

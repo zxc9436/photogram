@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cos.photogramstart.config.auth.PrincipalDetails;
+import com.cos.photogramstart.domain.image.Image;
 import com.cos.photogramstart.domain.user.User;
 import com.cos.photogramstart.handler.ex.CustomValidationApiException;
+import com.cos.photogramstart.service.ImageService;
 import com.cos.photogramstart.service.SubscribeService;
 import com.cos.photogramstart.service.UserService;
 import com.cos.photogramstart.web.dto.CMRespDto;
@@ -34,6 +36,7 @@ public class UserApiController {
 	
 	private final UserService userService;
 	private final SubscribeService subscribeService;
+	private final ImageService imageService;
 	
 	@PutMapping("/api/user/{principalId}/profileImageUrl")
 	public ResponseEntity<?> profileImageUrlUpdate(@PathVariable int principalId,MultipartFile profileImageFile,
@@ -64,5 +67,11 @@ public class UserApiController {
 		principalDetails.setUser(userEntity); //세션 정보 변경
 		
 		return new CMRespDto<>(1,"회원수정완료",userEntity); //응답시에 userEntity의 모든 getter함수가 호출되고 JSON으로 파싱하여 응답한다.
+	}
+	
+	@GetMapping("/api/user/{imageId}")
+	public ResponseEntity<?> modalImage(@PathVariable int imageId, @AuthenticationPrincipal PrincipalDetails principalDetails){
+		Image imageEntity = imageService.모달이미지(imageId, principalDetails.getUser().getId());
+		return new ResponseEntity<>(new CMRespDto<>(1,"스토리 모달 가져오기 성공", imageEntity),HttpStatus.OK); 
 	}
 }

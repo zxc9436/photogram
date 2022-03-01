@@ -36,18 +36,22 @@ function getStoryItem(image) {
 	let item =`<div class="story-list__item"  id="storyListItem-${image.id}">
 						<div class="sl__item__header">
 							<div>
-								<img class="profile-image" src="/upload/${image.user.profileImageUrl}"
-									onerror="this.src='/images/basic.png'" />
+								<a href="/user/${image.user.id}"><img class="profile-image" src="/upload/${image.user.profileImageUrl}"
+									onerror="this.src='/images/basic.png'" /></a>
 							</div>
-							<div><b><a href="/user/${image.user.id}">${image.user.username}</a></b></div>
+							<div><b><a href="/user/${image.user.id}">${image.user.username}</a></b></div>`;
+							if(principalId == image.user.id){
+								item +=`
 								<div style="float:right;">
 									<button type="button" class="modi" onclick="popup('.modal-info',${image.id})" style="border: none; background: none;">
 										<i class="fas fa-bars"></i>
 									</button>
-								</div>
+								</div>`;
+								}
+	
+						item +=`
 						</div>
-							
-
+	
 						<div class="sl__item__img">
 							<img src="/upload/${image.postImageUrl}" />
 						</div>
@@ -59,7 +63,7 @@ function getStoryItem(image) {
 									if(image.likeState){
 										item +=`<i class="fas fa-heart active" style="padding-left:10px;" id="storyLikeIcon-${image.id}" onclick="toggleLike(${image.id})"></i>`;
 									}else{
-										item +=`<i class="far fa-heart" id="storyLikeIcon-${image.id}" onclick="toggleLike(${image.id})"></i>`;
+										item +=`<i class="far fa-heart" style="padding-left:10px;" id="storyLikeIcon-${image.id}" onclick="toggleLike(${image.id})"></i>`;
 									}
 									
 								item +=`
@@ -82,7 +86,7 @@ function getStoryItem(image) {
 									image.comment.forEach((comment)=>{
 									item +=`<div class="sl__item__contents__comment" id="storyCommentItem-${comment.id}">
 													<p>
-														<b><a href="/user/${comment.user.id}">${comment.user.username}</a> :</b> ${comment.content}
+														<b><a href="/user/${comment.user.id}" id="commentId">${comment.user.username}</a> :</b> ${comment.content}
 													</p>`;
 					
 									if(principalId == comment.user.id){
@@ -92,7 +96,8 @@ function getStoryItem(image) {
 									}
 									
 									item +=`
-								</div>`;
+								</div>
+								<span class="commentDate" id="commentDate-${comment.id}"}>${comment.createDate}</span>`;
 								});
 								
 							item +=`
@@ -104,7 +109,6 @@ function getStoryItem(image) {
 						<div class="modal-info" onclick="modalStory()">
 							<div class="modal">
 								<button onclick="storyDelete(deleteId)"><span style="color:red;"><strong>삭제</strong></span></button>
-								<button onclick="#">게시물로 이동</button>
 								<button onclick="closePopup('.modal-story')">취소</button>
 							</div>
 						</div>
@@ -190,6 +194,7 @@ function addComment(imageId) {
 		alert("댓글을 작성해주세요!");
 		return;
 	}
+
 	
 	$.ajax({
 		type:"post",
@@ -205,11 +210,12 @@ function addComment(imageId) {
 	let content = `
 		  <div class="sl__item__contents__comment" id="storyCommentItem-${comment.id}"> 
 		    <p>
-		      <b><a href="/user/${comment.user.id}">${comment.user.username}</a> :</b>
+		      <b><a href="/user/${comment.user.id}" id="commentId">${comment.user.username}</a> :</b>
 		      ${comment.content}
 		    </p>
 		    <button onclick="deleteComment(${comment.id})"><i class="fas fa-times"></i></button>
-		  </div>`;
+		  </div>
+		  <span class="commentDate" id="commentDate-${comment.id}"}>${comment.createDate}</span>`;
 		commentList.prepend(content);
 
 		
@@ -232,6 +238,7 @@ function deleteComment(commentId) {
 	}).done(res=>{
 		console.log("성공",res);
 		$(`#storyCommentItem-${commentId}`).remove();
+		$(`#commentDate-${commentId}`).remove();
 	}).fail(error=>{
 		console.log("실패",error);
 	})
@@ -248,7 +255,6 @@ function storyDelete(imageId) {
 		window.location.replace("/");
 	}).fail(error=>{
 		console.log("실패",error);
-		console.log(imageId);
 	})
 }
 

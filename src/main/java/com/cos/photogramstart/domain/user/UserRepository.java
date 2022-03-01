@@ -1,6 +1,7 @@
 package com.cos.photogramstart.domain.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 //어노테이션이 없어도 JpaRepository를 상속하면 IoC등록이 자동으로 된다.
 public interface UserRepository extends JpaRepository<User, Integer>{
@@ -8,4 +9,7 @@ public interface UserRepository extends JpaRepository<User, Integer>{
 	User findByUsername(String username);
 	
 	User findUserByEmail(String email);
+	
+	@Query(value="SELECT id FROM user WHERE LOWER(NAME)=LOWER(:keyword)", nativeQuery = true)
+	int searchUser(String keyword);
 }

@@ -87,8 +87,15 @@ public class ImageService {
 				Image imageEntity = imageRepository.save(image);
 				
 				//Tag 저장
-				List<Tag> tags = TagUtils.parsingToTagObject(imageUploadDto.getTags(), imageEntity);
-				tagRepository.saveAll(tags);
+				if(imageUploadDto.getTags().length() == 0 || imageUploadDto.getTags().charAt(0) == '#') {
+					List<Tag> tags = TagUtils.parsingToTagObject(imageUploadDto.getTags(), imageEntity);
+					tagRepository.saveAll(tags);
+				}else {
+					throw new CustomException("태그를 입력할 땐 # 을 붙혀주세요!!");
+				}
+				
+				
+				
 			} else {
 				throw new CustomException("이미지 파일만 업로드 할 수 있습니다.");
 			}	
@@ -120,9 +127,9 @@ public class ImageService {
 	}
 	
 	@Transactional(readOnly = true)
-    public Page<Image> 태그검색(String tagName, int principalId, Pageable pageable) {
+    public Page<Image> 태그검색(String tagname, int principalId, Pageable pageable) {
 		
-        Page<Image> imageList = imageRepository.searchResult(tagName, pageable);
+        Page<Image> imageList = imageRepository.searchResult(tagname, pageable);
 
         imageList.forEach((image) -> {
         	image.setLikeCount(image.getLikes().size());
@@ -133,4 +140,19 @@ public class ImageService {
         });
         return imageList;
     }
+	
+	@Transactional(readOnly = true)
+	public Image 모달이미지(int imageId, int principalId){
+		Image imageEntity = imageRepository.findById(imageId).orElseThrow(()->{
+				throw new CustomException("이미지를 찾을 수 없습니다.");
+			});
+		
+		imageEntity.setLikeCount(imageEntity.getLikes().size());
+		imageEntity.getLikes().forEach((like)->{
+			if(like.getUser().getId() == principalId) { //해당 이미지에 좋아요한 사람들을 찾아서 현재 로그인한 사람이 좋아요 한것인지 비교
+				imageEntity.setLikeState(true);
+			}
+		});
+		return imageEntity;
+	}
 }

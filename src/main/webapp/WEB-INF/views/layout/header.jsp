@@ -43,8 +43,10 @@
 			<a href="/" class="logo">
 				<img src="/images/logo.jpg" alt="">
 			</a>
-			<form action="/" method="get" class="form-inline">
-			<input class="form-control mr-sm-2" name="keyword" type="search" placeholder=" 검색" aria-label="Search" />
+			<form action="/user/search" method="get" class="searchingForm">
+				<input name="keyword"  id="keyword"  type="text" placeholder=" 검색" aria-label="Search" />
+				<input type="submit" value="" id="xxx">
+				<i class="fa fa-search" aria-hidden="true"></i>
 			</form>
 			<nav class="navi">
 				<ul class="navi-list">

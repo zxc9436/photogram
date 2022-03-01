@@ -1,8 +1,5 @@
 package com.cos.photogramstart.service;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +9,9 @@ import com.cos.photogramstart.domain.image.Image;
 import com.cos.photogramstart.domain.user.User;
 import com.cos.photogramstart.domain.user.UserRepository;
 import com.cos.photogramstart.handler.ex.CustomApiException;
+
+import com.cos.photogramstart.handler.ex.CustomValidationApiException;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +24,9 @@ public class CommentService {
 	
 	@Transactional
 	public Comment 댓글쓰기(String content, int imageId, int userId) {
+		if(content.length() > 100) {
+			throw new CustomValidationApiException("댓글은 100자 이내로 작성해 주세요.");
+		}
 		
 		//Tip (객체를 만들 때 id값만 담아서 insert 할 수 있다)
 		//대신 return 시에 image객체와 user객체는 id값만 가지고 있는 빈 객체를 리턴받는다
@@ -31,9 +34,9 @@ public class CommentService {
 		image.setId(imageId);
 		
 		User userEntity = userRepository.findById(userId).orElseThrow(()->{
-			throw new CustomApiException("유저 아이디를 찾을 수 없습니다");
+			throw new CustomApiException("유저 아이디를 찾을 수 없습니다.");
 		});
-		
+
 		Comment comment = new Comment();
 		comment.setContent(content);
 		comment.setImage(image);
