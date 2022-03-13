@@ -10,15 +10,19 @@
 
 // (0) 현재 로그인한 사용자 아이디
 let principalId = $("#principalId").val();
+let tag = document.getElementById("tag").value;
+let imageId = document.getElementById("imageId").value;
+
 
 
 // (1) 스토리 로드하기
 let page = 0;
-let tagname = document.getElementById('aaa').value;
+
 
 function searchLoad() {
+	
 	$.ajax({
-		url:`/api/image/search?tagname=${tagname}&page=${page}`,
+		url:`/api/image/search?tag=${tag}&page=${page}`,
 		dataType:"json"
 	}).done(res=>{
 		if(res.data.totalElements == 0){
@@ -43,12 +47,17 @@ function getSearchItem(image) {
 								<a href="/user/${image.user.id}"><img class="profile-image" src="/upload/${image.user.profileImageUrl}"
 									onerror="this.src='/images/basic.png'" /></a>
 							</div>
-							<div><b><a href="/user/${image.user.id}">${image.user.username}</a></b></div>
+							<div><b><a href="/user/${image.user.id}">${image.user.username}</a></b></div>`;
+							if(principalId == image.user.id){
+								item +=`
 								<div style="float:right;">
 									<button type="button" class="modi" onclick="popup('.modal-info',${image.id})" style="border: none; background: none;">
 										<i class="fas fa-bars"></i>
 									</button>
-								</div>
+								</div>`;
+								}
+	
+						item +=`
 						</div>
 							
 
@@ -77,10 +86,12 @@ function getSearchItem(image) {
 							</div>
 							<div class="sl__item__contents__tags">`;
 							
-							image.tags.forEach((tags)=>{
-								item +=`
-									<span class="tag-span" onclick="location.href='/image/search?name=${tags.name}'">#${tags.name}</span>`;
-								});
+									let arr = image.tag.split('  ');
+							
+									for(let i = 0; i < arr.length; i++){
+										item +=`<span class="tag-span" onclick="location.href='/image/search?tag=${arr[i]}'">#${arr[i]}</span>`;
+									}
+							
 								item +=`</div><div id="storyCommentList-${image.id}">`;
 								
 								image.comment.forEach((comment)=>{
@@ -278,8 +289,6 @@ function modalClose() {
 	$(".modal-subscribe").css("display", "none");
 	location.reload();
 }
-
-
 
 
 

@@ -1,26 +1,17 @@
 package com.cos.photogramstart.util;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.cos.photogramstart.domain.image.Image;
-import com.cos.photogramstart.domain.tag.Tag;
+import com.cos.photogramstart.web.dto.image.ImageUploadDto;
 
 public class TagUtils {
-	
-	public static List<Tag> parsingToTagObject(String tags, Image imageEntity){
-		String temp[] = tags.split("#"); // #여행 #바다
-		List<Tag> list = new ArrayList<>();
-	
-		// 도라에몽 : 파싱할 때 0번지에 공백이 들어와서 시작번지를 1로 함.
-		for (int i=1; i<temp.length; i++) {
-			Tag tag = Tag.builder()
-					.name(temp[i].trim())
-					.image(imageEntity)
-					.build();
-			list.add(tag);
-		}
-		
-		return list;
+	 
+	public static void parsingToTagObject(String tag, ImageUploadDto imageUploadDto){
+		String temp[] = tag.split("#"); // #여행 #바다
+		String tagJoin  = String.join(" ", tag.split("#")); //다시 문자 합체시켜줌
+		imageUploadDto.tagUpdate(tagJoin.trim());
 	}
 }

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cos.photogramstart.config.auth.PrincipalDetails;
 import com.cos.photogramstart.domain.image.Image;
-import com.cos.photogramstart.domain.tag.Tag;
 import com.cos.photogramstart.service.ImageService;
 import com.cos.photogramstart.service.LikesService;
 import com.cos.photogramstart.web.dto.CMRespDto;
@@ -61,12 +60,20 @@ public class ImageApiController {
         return new ResponseEntity<>(new CMRespDto<>(1,"스토리삭제 성공",null), HttpStatus.OK);
     }
 
-	//태그관련
+	//태그검색
     @GetMapping("/api/image/search")
-    public ResponseEntity<?> searchTag(@RequestParam(value="tagname", required=false) String tagname, @AuthenticationPrincipal PrincipalDetails principalDetails,
+    public ResponseEntity<?> searchTag(@RequestParam String tag, @AuthenticationPrincipal PrincipalDetails principalDetails,
                                 @PageableDefault(size=3) Pageable pageable) {
-    	Page<Image> images = imageService.태그검색(tagname, principalDetails.getUser().getId(), pageable);
+    	Page<Image> images = imageService.태그검색(tag, principalDetails.getUser().getId(), pageable);
     	
         return new ResponseEntity<>(new CMRespDto<>(1,"태그검색 성공", images), HttpStatus.OK);
+    }
+    
+    @GetMapping("/api/image/modalSearch")
+    public ResponseEntity<?> searchModal(@RequestParam int imageId) {
+    	
+    	Image image =imageService.모달검색(imageId);
+        return new ResponseEntity<>(new CMRespDto<>(1,"해당 모달검색 성공", image), HttpStatus.OK);
+        
     }
 }

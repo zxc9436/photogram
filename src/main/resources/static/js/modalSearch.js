@@ -1,5 +1,5 @@
 /**
-	2. 스토리 페이지
+	2. 검색 페이지
 	(1) 스토리 로드하기
 	(2) 스토리 스크롤 페이징하기
 	(3) 좋아요, 안좋아요
@@ -10,29 +10,37 @@
 
 // (0) 현재 로그인한 사용자 아이디
 let principalId = $("#principalId").val();
-let deleteId = "";
+
+let imageId = document.getElementById("imageId").value;
+
+
 
 // (1) 스토리 로드하기
 let page = 0;
 
-function storyLoad() {
+
+function modalSearchLoad() {
+	console.log(imageId);
 	$.ajax({
-		url:`/api/image?page=${page}`,
+		url:`/api/image/modalSearch?imageId=${imageId}`,
 		dataType:"json"
 	}).done(res=>{
-		console.log(res);
-		res.data.content.forEach((image)=>{
-			let storyItem = getStoryItem(image);
+		if(res.data.totalElements == 0){
+			alert("검색 결과가 없습니다.");
+			window.history.back();
+		}
+		console.log("성공", res);
+			let storyItem = getSearchItem(res.data);
 			$("#storyList").append(storyItem);
-		})
+		
 	}).fail(error=>{
 		console.log("오류",error);
 	});
 }
+modalSearchLoad();
 
-storyLoad();
 
-function getStoryItem(image) {
+function getSearchItem(image) {
 	let item =`<div class="story-list__item"  id="storyListItem-${image.id}">
 						<div class="sl__item__header">
 							<div>
@@ -51,7 +59,8 @@ function getStoryItem(image) {
 	
 						item +=`
 						</div>
-	
+							
+
 						<div class="sl__item__img">
 							<img src="/upload/${image.postImageUrl}" />
 						</div>
@@ -63,7 +72,7 @@ function getStoryItem(image) {
 									if(image.likeState){
 										item +=`<i class="fas fa-heart active" style="padding-left:10px;" id="storyLikeIcon-${image.id}" onclick="toggleLike(${image.id})"></i>`;
 									}else{
-										item +=`<i class="far fa-heart" style="padding-left:10px;" id="storyLikeIcon-${image.id}" onclick="toggleLike(${image.id})"></i>`;
+										item +=`<i class="far fa-heart" id="storyLikeIcon-${image.id}" onclick="toggleLike(${image.id})"></i>`;
 									}
 									
 								item +=`
@@ -75,20 +84,20 @@ function getStoryItem(image) {
 							<div class="sl__item__contents__content" style="padding-bottom:15px;">
 								<p>${image.caption}</p>
 							</div>
-							<div class="sl__item__contents__tags">`; 
+							<div class="sl__item__contents__tags">`;
 							
-							let arr = image.tag.split('  ');
+									let arr = image.tag.split('  ');
 							
-							for(let i = 0; i < arr.length; i++){
-								item +=`<span class="tag-span" onclick="location.href='/image/search?tag=${arr[i]}'">#${arr[i]}</span>`;
-							}
-
-							item +=`</div><div id="storyCommentList-${image.id}">`;
-									
-									image.comment.forEach((comment)=>{
+									for(let i = 0; i < arr.length; i++){
+										item +=`<span class="tag-span" onclick="location.href='/image/search?tag=${arr[i]}'">#${arr[i]}</span>`;
+									}
+							
+								item +=`</div><div id="storyCommentList-${image.id}">`;
+								
+								image.comment.forEach((comment)=>{
 									item +=`<div class="sl__item__contents__comment" id="storyCommentItem-${comment.id}">
 													<p>
-														<b><a href="/user/${comment.user.id}" id="commentId">${comment.user.username}</a> :</b> ${comment.content}
+														<b><a href="/user/${comment.user.id}">${comment.user.username}</a> :</b> ${comment.content}
 													</p>`;
 					
 									if(principalId == comment.user.id){
@@ -98,40 +107,27 @@ function getStoryItem(image) {
 									}
 									
 									item +=`
-								</div>
-								<span class="commentDate" id="commentDate-${comment.id}"}>${comment.createDate}</span>`;
+									</div>
+									<span class="commentDate" id="commentDate-${comment.id}"}>${comment.createDate}</span>`;
 								});
 								
 							item +=`
 						</div>
 							<div class="sl__item__input">
 								<input type="text" placeholder="댓글 달기..." id="storyCommentInput-${image.id}" />
-								<button type="button" onclick="addComment(${image.id})">게시</button>
+								<button type="button" onClick="addComment(${image.id})">게시</button>
 							</div>
-						<div class="modal-info" onclick="modalStory()">
-							<div class="modal">
-								<button onclick="storyDelete(deleteId)"><span style="color:red;"><strong>삭제</strong></span></button>
-								<button onclick="closePopup('.modal-story')">취소</button>
-							</div>
+					</div>
+					<div class="modal-info" onclick="modalStory()">
+						<div class="modal">
+							<button onclick="storyDelete(deleteId)"><span style="color:red;"><strong>삭제</strong></span></button>
+							<button onclick="closePopup('.modal-story')">취소</button>
 						</div>
 					</div>
+				</div>
 					`;
 	return item;
 }
-
-// (2) 스토리 스크롤 페이징하기
-$(window).scroll(() => {
-	/*console.log("윈도우 scrollTop",$(window).scrollTop());
-	console.log("문서의 높이",$(document).height());
-	console.log("윈도우 높이",$(window).height());*/
-	
-	let checkNum = $(window).scrollTop() - ($(document).height() - $(window).height());
-	
-	if(checkNum <1 && checkNum > -1){
-		page++;
-		storyLoad();
-	}
-});
 
 
 // (3) 좋아요, 안좋아요
@@ -196,7 +192,10 @@ function addComment(imageId) {
 		alert("댓글을 작성해주세요!");
 		return;
 	}
-
+	if (data.content.length > 100) { //프론트 단에서 막기
+		alert("댓글은 100자 이내로 작성해 주세요.");
+		return;
+	}
 	
 	$.ajax({
 		type:"post",
@@ -211,12 +210,14 @@ function addComment(imageId) {
 		
 	let content = `
 		  <div class="sl__item__contents__comment" id="storyCommentItem-${comment.id}"> 
-		      <span><b><a href="/user/${comment.user.id}" id="commentId">${comment.user.username}</a> : </b>${comment.content}</span>
+		    <p>
+		      <b><a href="/user/${comment.user.id}">${comment.user.username}</a> :</b>
+		      ${comment.content}
+		    </p>
 		    <button onclick="deleteComment(${comment.id})"><i class="fas fa-times"></i></button>
 		  </div>
 		  <span class="commentDate" id="commentDate-${comment.id}"}>${comment.createDate}</span>`;
 		commentList.prepend(content);
-
 		
 	}).fail(error=>{
 		console.log("오류",error.responseJSON.data.content);
@@ -274,9 +275,6 @@ function modalClose() {
 	$(".modal-subscribe").css("display", "none");
 	location.reload();
 }
-
-
-
 
 
 

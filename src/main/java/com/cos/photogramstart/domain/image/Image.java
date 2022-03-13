@@ -19,7 +19,6 @@ import org.springframework.data.annotation.CreatedDate;
 
 import com.cos.photogramstart.domain.comment.Comment;
 import com.cos.photogramstart.domain.likes.Likes;
-import com.cos.photogramstart.domain.tag.Tag;
 import com.cos.photogramstart.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -40,16 +39,12 @@ public class Image {
 	private int id;
 	private String caption; // 오늘 나 너무 피곤해!!
 	private String postImageUrl; // 사진을 전송받아서 그 사진을 서버에 특정 폴더에 저장 - DB에 그 저장된 경로를 insert
+	private String tag;
 
 	@JsonIgnoreProperties({"images"})
 	@JoinColumn(name = "userId") //FK의 이름을 저장
 	@ManyToOne
 	private User user; // 누가 올렸는지
-	
-	//태그 기능
-	@JsonIgnoreProperties({"image"})
-	@OneToMany(mappedBy = "image")
-	private List<Tag> tags;
 	
 	// 이미지 좋아요 기능
 	@JsonIgnoreProperties({"image"})

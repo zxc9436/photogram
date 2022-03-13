@@ -194,25 +194,25 @@ function getStoryModalItem(i){
 		
 		<div class="story-list" id="storyModalList">
 			<div class="story-image" id="storyImage">
-				<img src="/upload/${i.postImageUrl}" alt="error image" style="width:100%; height:646px;">
+				<img src="/upload/${i.postImageUrl}" alt="error image" style="width:100%; height:400px;">
 			</div>
 			
 			<div class="story-content" id="storyContent">
 				<div class="storyTelling">
-						<b>${i.user.username}&nbsp;&nbsp;</b>${i.caption}
+						<b style="padding-left:15px;">${i.user.username}&nbsp;&nbsp;</b>${i.caption}
 						<div class="sl__item__contents__tags">`;
 						
-						i.tags.forEach((tags)=>{
-									item +=`
-										<span class="tag-spanModal" onclick="location.href='/image/search?name=${tags.name}'" >#${tags.name}</span>`;
-									});
-		   item +=`</div>
+							let arr = i.tag.split('  ');
+							
+							for(let i = 0; i < arr.length; i++){
+								item +=`<span class="tag-span" onclick="location.href='/image/search?tag=${arr[i]}'">#${arr[i]}</span>`;
+							}
+							
+/*		   item +=`</div>
 		   		<div id="storyCommentList-${i.id}">`;
 		   		i.comment.forEach((comment)=>{
 									item +=`<div id="storyCommentItem-${comment.id}">
-													<p>
-														<b><a href="/user/${comment.user.id}" id="commentId">${comment.user.username}</a> :</b> ${comment.content}
-													</p>`;
+														<b><a href="/user/${comment.user.id}" id="commentId">${comment.user.username}</a> :</b> ${comment.content}`;
 					
 									if(principalId == comment.user.id){
 										item +=`<button onclick="deleteComment(${comment.id})">
@@ -223,39 +223,39 @@ function getStoryModalItem(i){
 			item +=`</div>
 				</div>
 				<span class="commentDate" id="commentDate-${comment.id}"}>${comment.createDate}</span>`;
-				});
+				});*/
 				
 				
 			item +=`</div>
 				<div class="storyLikes">
 					<div class="sl__item__contents__icon">
-					<button>`;
+					<button style="border:none;background:white;color:red;">`;
 									//좋아요 아이콘
 									if(i.likeState){
-										item +=`<i class="fas fa-heart active" style="margin-left:15px;" id="storyLikeIcon-${i.id}" onclick="toggleLike(${i.id})"></i>`;
+										item +=`<i class="fas fa-heart active" id="storyLikeIcon-${i.id}" onclick="toggleLike(${i.id})"></i>`;
 										
 									}else{
-										item +=`<i class="far fa-heart" style="margin-left:15px;" id="storyLikeIcon-${i.id}" onclick="toggleLike(${i.id})"></i>`;
+										item +=`<i class="far fa-heart" id="storyLikeIcon-${i.id}" onclick="toggleLike(${i.id})"></i>`;
 										
 									}
 	  item +=`</button>
 	  				</div>
-	  			<span class="like"><b id="storyLikeCount-${i.id}">${i.likeCount} </b>likes</span>
-	  				<p style="margin-left:15px; margin-top:10px;">${i.createDate}</p>
+	  			<span class="like"><b id="storyLikeCount-${i.id}">${i.likeCount}</b> likes</span>
+	  				<p style="margin-top:10px;">${i.createDate}</p>
 				</div>
+				<hr>
 				<div class="storyComment">
-						<input type="text" placeholder="댓글 달기..."  id="storyCommentInput-${i.id}" style="width:92%; border:none; padding-left:20px; font-size:15px; padding-top:15px;"/>
-						<button type="button" onclick="addComment(${i.id})" style="border:none; background-color:white; color:#01A9DB;"><b>게시</b></button>	
-				</div>
-			</div>
-			<div class="modal-delete" onclick="modalDelete()">
-				<div class="modal">
-					<button onclick="myStoryDelete(deleteId)"><span style="color:red;"><strong>삭제</strong></span></button>
-					<button onclick="closePopup('.modal-delete')">취소</button>
+						<a href="/image/modalSearch?imageId=${i.id}">댓글보러가기...</a>	
 				</div>
 			</div>
 		</div>
 	</div>
+				<div class="modal-delete" onclick="modalDelete()">
+				<div class="modal">
+					<button onclick="myStoryDelete(deleteId, ${i.user.id})"><span style="color:red;"><strong>삭제</strong></span></button>
+					<button onclick="closePopup('.modal-delete')">취소</button>
+				</div>
+			</div>
 `;
 	
 	return item;
@@ -273,7 +273,7 @@ function closePopup(obj) {
 	$(obj).css("display", "none");
 }
 
-function myStoryDelete(imageId) {
+function myStoryDelete(imageId, userId) {
 		$.ajax({
 		type:"delete",
 		url:`/api/image/${imageId}`,
@@ -281,7 +281,7 @@ function myStoryDelete(imageId) {
 	}).done(res=>{
 		console.log("성공",res);
 		$(`#story-${imageId}`).remove();
-		window.location.replace("/");
+		window.location.replace(`/user/${userId}`);
 	}).fail(error=>{
 		console.log("실패",error);	
 	})

@@ -18,8 +18,6 @@ import com.cos.photogramstart.domain.comment.CommentRepository;
 import com.cos.photogramstart.domain.image.Image;
 import com.cos.photogramstart.domain.image.ImageRepository;
 import com.cos.photogramstart.domain.likes.LikesRepository;
-import com.cos.photogramstart.domain.tag.Tag;
-import com.cos.photogramstart.domain.tag.TagRepository;
 import com.cos.photogramstart.handler.ex.CustomApiException;
 import com.cos.photogramstart.handler.ex.CustomException;
 import com.cos.photogramstart.util.TagUtils;
@@ -34,7 +32,6 @@ public class ImageService {
 	private final ImageRepository imageRepository;
 	private final LikesRepository likesRepository;
 	private final CommentRepository commentRepository;
-	private final TagRepository tagRepository;
 
 	
 	
@@ -82,20 +79,17 @@ public class ImageService {
 					e.printStackTrace();
 				}
 				
-				//image 테이블에 저장
-				Image image = imageUploadDto.toEntity(imageFileName, principalDetails.getUser());
-				Image imageEntity = imageRepository.save(image);
-				
 				//Tag 저장
-				if(imageUploadDto.getTags().length() == 0 || imageUploadDto.getTags().charAt(0) == '#') {
-					List<Tag> tags = TagUtils.parsingToTagObject(imageUploadDto.getTags(), imageEntity);
-					tagRepository.saveAll(tags);
+				if(imageUploadDto.getTag().length() == 0 || imageUploadDto.getTag().charAt(0) == '#') {
+					TagUtils.parsingToTagObject(imageUploadDto.getTag(), imageUploadDto);
 				}else {
 					throw new CustomException("태그를 입력할 땐 # 을 붙혀주세요!!");
 				}
 				
-				
-				
+				//image 테이블에 저장
+				Image image = imageUploadDto.toEntity(imageFileName, principalDetails.getUser());
+				Image imageEntity = imageRepository.save(image);
+						
 			} else {
 				throw new CustomException("이미지 파일만 업로드 할 수 있습니다.");
 			}	
@@ -111,9 +105,6 @@ public class ImageService {
 			  //관련된 likes의 정보 먼저 삭제해 준다.
 		        likesRepository.deleteLikesByImage(image);
 		        
-		        //관련된 tag의 정보 먼저 삭제해 준다.
-		        tagRepository.deleteTagsByImage(image);
-		        
 		        //관련된 Comment의 정보 먼저 삭제해 준다.
 		        commentRepository.deleteCommentsByImage(image);
 
@@ -127,10 +118,11 @@ public class ImageService {
 	}
 	
 	@Transactional(readOnly = true)
-    public Page<Image> 태그검색(String tagname, int principalId, Pageable pageable) {
+    public Page<Image> 태그검색(String tag, int principalId, Pageable pageable) {
 		
-        Page<Image> imageList = imageRepository.searchResult(tagname, pageable);
+        Page<Image> imageList = imageRepository.searchResult(tag, pageable);
 
+        //좋아요 상태 담기
         imageList.forEach((image) -> {
         	image.setLikeCount(image.getLikes().size());
         	
@@ -155,4 +147,12 @@ public class ImageService {
 		});
 		return imageEntity;
 	}
+	
+	@Transactional(readOnly = true)
+    public Image 모달검색(int imageId) {
+		Image imageEntity = imageRepository.findById(imageId).orElseThrow(()->{
+			throw new CustomException("알수없는 오류로 검색을 하지못했습니다.");
+		});
+        return imageEntity;
+    }
 }

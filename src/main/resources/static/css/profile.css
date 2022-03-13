@@ -474,17 +474,15 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.7);
   display: none;
-  align-items: center;
+  padding-top:150px;
   justify-content: center;
 }
 .modal-story .story {
-  width: 1300px;
-  height: 700px;
+  height: 500px;
   background-color: #fff;
   border-radius: 10px;
-  
   flex-direction: column;
 }
 .modal-story .story .story-header {
@@ -537,21 +535,24 @@
   align-items: center;
 }
 #storyModalList{
-	display:flex; 
+	background-color: #fff;
 }
 #storyImage{
-	border-right: 1px solid #ddd;
-	width:60%;
+
 }
 #storyContent{
-	flex-direction:column;
+	background-color: #fff;
 }
 .storyTelling{
 	border-bottom: 1px solid #ddd;	
 }
 .storyLikes{
-
+	background-color: #fff;
+	padding-left:15px;
+	margin-bottom:10px;
 }
 .storyComment{
-	
+	background-color: #fff;
+	padding-left:15px;
+	margin-bottom:10px;
 }

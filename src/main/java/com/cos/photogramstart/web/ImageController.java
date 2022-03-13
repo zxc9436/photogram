@@ -13,7 +13,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.cos.photogramstart.config.auth.PrincipalDetails;
 import com.cos.photogramstart.domain.image.Image;
-import com.cos.photogramstart.domain.tag.Tag;
 import com.cos.photogramstart.handler.ex.CustomValidationException;
 import com.cos.photogramstart.service.ImageService;
 import com.cos.photogramstart.web.dto.image.ImageUploadDto;
@@ -58,9 +57,14 @@ public class ImageController {
 	}
 	
 	@GetMapping("/image/search")
-	public String search(@ModelAttribute("tag") Tag tag, Model model) {
+	public String search(@RequestParam(value="tag") String tag, Model model) {
 		model.addAttribute("tag",tag);
 		return "image/search";
 	}
 	
+	@GetMapping("/image/modalSearch")
+	public String modalSearch(@RequestParam(value="imageId") int imageId, Model model) {
+		model.addAttribute("imageId",imageId);
+		return "image/modalSearch";
+	}
 }

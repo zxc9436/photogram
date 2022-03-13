@@ -16,8 +16,8 @@ public interface ImageRepository extends JpaRepository<Image, Integer>{
 	//좋아요가 있는 이미지만 출력
 	@Query(value ="SELECT i.* FROM image i INNER JOIN (SELECT imageId, COUNT(imageId) likeCount FROM likes GROUP BY imageId) c ON i.id = c.imageId ORDER BY likeCount DESC", nativeQuery = true)
 	List<Image> mPopular();
-
-    @Query(value ="SELECT a.* FROM image AS a INNER JOIN tag AS b ON a.id = b.imageId WHERE name = :tagname ", nativeQuery = true)
-    Page<Image> searchResult(@Param("tagname") String tagname, Pageable pageable);
-    
+ 
+	//태그검색
+	@Query(value ="SELECT * FROM image WHERE tag LIKE :tag OR tag LIKE CONCAT('% ',:tag,' %') OR tag LIKE CONCAT('% ',:tag) OR tag LIKE CONCAT(:tag,' %') ORDER BY id DESC", nativeQuery = true)
+	Page<Image> searchResult(@Param("tag") String tag, Pageable pageable);
 }
