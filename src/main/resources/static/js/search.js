@@ -11,7 +11,6 @@
 // (0) 현재 로그인한 사용자 아이디
 let principalId = $("#principalId").val();
 let tag = document.getElementById("tag").value;
-let imageId = document.getElementById("imageId").value;
 
 
 
