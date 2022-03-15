@@ -1,1 +1,1 @@
-web: java -Dserver.port=81 -jar /target/photogram-start-0.0.1-SNAPSHOT.war
+web: java -jar target/photogram-start-0.0.1-SNAPSHOT.war
