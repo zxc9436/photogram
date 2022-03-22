@@ -1,7 +1,4 @@
-# 포토그램 - 인스타그램 클론 코딩
-
-### STS 툴에 세팅하기 - 플러그인 설정
-- https://blog.naver.com/getinthere/222322821611
+# Photogram
 
 ### 의존성
 
